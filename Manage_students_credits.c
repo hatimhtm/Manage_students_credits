@@ -53,7 +53,7 @@ int main(void){
 
    s_info arr[30], Studentcredit;
    a_info Advisordata;
-   int N_students_to_use = 4;
+   int N_students_to_use = 3;
    int choice, idToSearch;
    
    do{
@@ -184,10 +184,10 @@ void bubble_sort(s_info arr[],int N_students_to_use){
   s_info temp;
   for(i = 0 ; i < N_students_to_use ; i++){
        for(j = N_students_to_use ; j > i ; j--){
-            if(arr[j].n_earned_credits > arr[j+1].n_earned_credits){
+            if(arr[j].n_earned_credits > arr[j-1].n_earned_credits){
                  temp = arr[j];
-                 arr[j] = arr[j+1];
-                 arr[j+1] = temp;
+                 arr[j] = arr[j-1];
+                 arr[j-1] = temp;
             }
        }
   }
@@ -199,13 +199,15 @@ void selection_sort(s_info arr[],int N_students_to_use){
   for(i = 0 ; i < N_students_to_use ; i++){
        max = i;
        for(j = N_students_to_use ; j > i ; j--){
-            if(arr[j].n_earned_credits < arr[max].n_earned_credits){
-                 min = j;
+            if(arr[j].n_earned_credits > arr[max].n_earned_credits){
+                 max = j;
             }
        }
-       temp = arr[i];
-       arr[i] = arr[max];
-       arr[max] = temp;
+       if (max != i){
+            temp = arr[i];
+            arr[i] = arr[max];
+            arr[max] = temp;
+       }
   }
 }
 
