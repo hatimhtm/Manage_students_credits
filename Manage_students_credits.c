@@ -1,226 +1,245 @@
 /* CSC 2302 - Summer Session
    First Practical Session
-   Programmer Name: Hatim EL HASSAK
-  
-   We use the following students for testing:
-   VUCHI Mbifanse MILTON 84101 ASSEM Nasser
-   BAGHDADI Hasnae 85757 ABRACHE Jawad
-   BALADI Oussama 84606 KETTANI Driss 
-   SALIH-ALJ Khadija 101666 TALEI Hanaa
+   Programmer Name: Hanaa Talei (Part1) 
 */
+
+// For you to know what you have to do read the comments that starts with --->
 
 #include<stdio.h>
 #include<string.h>
 
 typedef struct{
-  char a_name[20];
-  char a_email[20];  
+  char a_name[40];
+  char a_email[40];  
 }a_info;
 
 typedef struct{
-  char s_name[20]; 
+  char s_name[40];
   int s_id;
   int n_earned_credits;
   a_info X; 
 }s_info;
 
-void fill_array(s_info arr[],int N_students_to_use);
-void display_array(s_info arr[],int N_students_to_use);
-a_info search_advisor_info(s_info arr[],int N_students_to_use, int idToSearch);
-s_info search_student_credits(s_info arr[],int N_students_to_use, int idToSearch);
-void clear_screen(void);
-void bubble_sort(s_info arr[],int N_students_to_use);
-void selection_sort(s_info arr[],int N_students_to_use);
-void display_array(s_info arr[],int N_students_to_use);
+void fillArray(s_info arr[40], FILE *infp, int *count);
+void displayArray(FILE * infp);
+a_info SearchAdvisorInfo(s_info arr[40], int count, int idToSearch);
+int Search_Ncrd(s_info arr[40], int count, int idToSearch);
+void menu(void);
+s_info selection_sorting(s_info arr[40], int count);
+void classification(s_info arr[40], int count);
 
-
-void menu(void){
-  
-  printf("\n\n\t\t--------------- Menu to Use-----------------\n");
-  printf("\t\t|\t\t\t\t\t   |\n");
-  printf("\t\t|1. Fill Array with Data\t\t   |\n");
-  printf("\t\t|2. Display Array Content\t\t   |\n");
-  printf("\t\t|3. Search for Student Advisor Information |\n");
-  printf("\t\t|4. Search for Student Earned Credits\t   |\n");
-  printf("\t\t|5. Sort Students by Name(Bubble Sort)\t   |\n");
-  printf("\t\t|6. Sort Students by N_ECr(Selection Sort) |\n");
-  printf("\t\t|7. QUIT\t\t\t\t   |\n");
-  printf("\t\t|\t\t\t\t\t   |\n");
-  printf("\t\t--------------------------------------------\n");
-  printf("\n\t\tYour Choice Please:");
-}
 int main(void){
 
-   s_info arr[30], Studentcredit;
-   a_info Advisordata;
-   int N_students_to_use = 3;
-   int choice, idToSearch;
-   
-   do{
-     menu();
-     scanf("%d",&choice);
+  s_info arr[40];
+  a_info AdvisorData;
+  int n_crd, count = 0;
+  int choice, toSearch;
+  FILE *infp;
+  infp = fopen("data.txt", "r");
+
+  if (!infp){
+    printf("Error opening file\n");
+    return 0;
+  }
+      
+  do{
+    menu(); 
+    scanf("%d",&choice); 
      
-     switch(choice){
-	
-	case 1:
-              clear_screen();
-              fill_array(arr,N_students_to_use);
-	       break;
-	case 2:
-              clear_screen();
-              display_array(arr,N_students_to_use);
-	       break;
-	case 3:
-              clear_screen();
-              printf("\n\t\tEnter Student ID to Search: ");
-              scanf("%d",&idToSearch);
-              Advisordata = search_advisor_info(arr, N_students_to_use, idToSearch);
-              if (strcmp(Advisordata.a_email, "Not found") == 0) {
-                     printf("\n\t\tStudent was not FOUND\n");
-              } else {
-                     printf("\n\t\tAdvisor information for %d: \n", idToSearch);
-                     printf("\n\t\tAdvisor Name: %s\n", Advisordata.a_name);
-                     printf("\n\t\tAdvisor Email: %s\n", Advisordata.a_email);
-              }
-	       break;
-	case 4:
-              clear_screen();
-              printf("\n\t\tEnter Student ID to Search: ");
-              scanf("%d",&idToSearch);
-              Studentcredit = search_student_credits(arr, N_students_to_use, idToSearch);
-              if (strcmp(Studentcredit.s_name, "Not found") == 0) {
-                     printf("\n\t\tStudent was not FOUND\n");
-              } else {
-                     printf("\n\t\tStudent information for %d: \n", idToSearch);
-                     printf("\n\t\tStudent Earned Credits: %d\n", Studentcredit.n_earned_credits);
-              }
-	       break;
-       case 5:
-              clear_screen();
-              bubble_sort(arr, N_students_to_use);
-              display_array(arr,N_students_to_use);
-	       break;
-	case 6:
-              clear_screen();
-              selection_sort(arr, N_students_to_use);
-              display_array(arr,N_students_to_use);
-	       break;
-	case 7:printf("\n\t\tYou decided to QUIT\n\n\t\tBYE\n\n\t");
-	
-	default:printf("\n\t\tThat was a WRONG Choice!\n");
-	}
-   }while(choice!=7);
+    switch(choice){
+	    case 1:
+        displayArray(infp);
+	      break;
+	    case 2:
+        fillArray(arr, infp, &count);
+        printf("\t\t%d", count);
+	      break;
+	    case 3:
+        printf("\n\t\tInput ID of the student to Search For:");
+	      scanf("%d",&toSearch); 
+	      AdvisorData = SearchAdvisorInfo(arr, count, toSearch);
+	      if(strcmp(AdvisorData.a_name,"NotFound")==0)
+	      printf("\n\t\tSORRY! Student was not FOUND\n");
+        else{
+			  printf("\n\t\t Advisor Information for %d:\n",toSearch);
+			  printf("\n\t\tAdvisor Name:%s\n\t\tEmail:%s\n",AdvisorData.a_name,AdvisorData.a_email);
+        }
+			  break;
+	    case 4:
+        printf("\n\t\tInput ID of the student to Search For:");
+	      scanf("%d",&toSearch); 
+	      n_crd = Search_Ncrd(arr, count, toSearch);
+	      if(n_crd == -1)
+			  printf("\n\t\tSORRY! Student was not FOUND\n");
+	      else
+	      printf("\n\t\t%d currently earned %d credit(s)\n",toSearch,n_crd); 
+	      break;
+      case 5: 
+        selection_sorting(arr, count);
+	      break;
+	    case 6:
+        classification(arr, count);
+	      break;
+	    case 7:printf("\n\t\tYou decided to QUIT\n\n\t\tBYE\n\n\t"); 
+	      break;	                   
+	    default:printf("\n\t\tThat was a WRONG Choice!\n");	 
+    }   
+  }while(choice!=7);
+  fclose(infp);
 return(0);
 }
 
-void fill_array(s_info arr[],int N_students_to_use){
-  int i;
-  for(i = 0 ; i < N_students_to_use ; i++){
-       printf("\t\tEnter Student ID: ");
-       scanf("%d", &arr[i].s_id);
-       printf("\t\tEnter Student Name: ");
-       getchar();
-       scanf("%[^\n]%*c", arr[i].s_name);
-       printf("\t\tEnter Student Earned Credits: ");
-       scanf("%d", &arr[i].n_earned_credits);
-       printf("\t\tEnter %s's Advisor Name: ", arr[i].s_name);
-       getchar();
-       scanf("%[^\n]%*c", arr[i].X.a_name);
-       printf("\t\tEnter Dr.%s's Email: ", arr[i].X.a_name);
-       scanf("%s", arr[i].X.a_email);
-       printf("\n");
+//--> You need to change this function so that the array is filled with data in the file!
+//-->File is already open in the main function
+
+void displayArray(FILE *infp){
+  char line[50];
+  while(fgets(line, 50, infp) != NULL){
+    printf("\t\t%s", line);
   }
 }
 
-void display_array(s_info arr[],int N_students_to_use){
-  int i;
-  for(i = 0 ; i < N_students_to_use ; i++){
-       printf("\t\tStudent ID: %d\n", arr[i].s_id);
-       printf("\t\tStudent Name: %s\n", arr[i].s_name);
-       printf("\t\tStudent Earned Credits: %d\n", arr[i].n_earned_credits);
-       printf("\t\tStudent Advisor Name: %s\n", arr[i].X.a_name);
-       printf("\t\tStudent Advisor Email: %s\n", arr[i].X.a_email);
-       printf("\n");
-       printf("\t\t--------------------------------------------\n");
-       printf("\n");
+void fillArray(s_info arr[40], FILE *infp, int *count){
+  char line[40], temp;
+  int i = 0;
+  fseek(infp, 0, 0);
+  while (!feof(infp)) {
+    fscanf(infp, "%d", &arr[i].s_id);
+    fscanf(infp, " %c", &temp);
+    fgets(arr[i].s_name, 40, infp);
+    fscanf(infp, "%d", &arr[i].n_earned_credits);
+    fscanf(infp, " %c", &temp);
+    fgets(arr[i].X.a_name, 40, infp);
+    fgets(arr[i].X.a_email, 40, infp);
+    fgets(line, 40, infp);
+    i++;
+    (*count)++;
   }
 }
 
-a_info search_advisor_info(s_info arr[],int N_students_to_use, int idToSearch){
-  int i;
-  a_info flag;
-  strcpy(flag.a_email, "Not found");
-  for(i = 0 ; i < N_students_to_use ; i++){
-       if(arr[i].s_id == idToSearch){
-           strcpy(flag.a_name, arr[i].X.a_name);
-           strcpy(flag.a_email, arr[i].X.a_email);
-           break;
-       }
+a_info SearchAdvisorInfo(s_info arr[40], int count, int idToSearch){
+  int i; 
+  a_info flag; 
+  strcpy(flag.a_name,"NotFound");
+  
+  for(i = 0; i < count; i++){
+    if(arr[i].s_id == idToSearch)//Found
+      return(arr[i].X);
   }
   return(flag);
 }
 
-s_info search_student_credits(s_info arr[],int N_students_to_use, int idToSearch){
-  int i;
-  s_info flag;
-  strcpy(flag.s_name, "Not found");
-  for(i = 0 ; i < N_students_to_use ; i++){
-       if(arr[i].s_id == idToSearch){
-              return(arr[i]);
-       }
+int Search_Ncrd(s_info arr[40], int count, int idToSearch){
+  int i; 
+  
+  for(i=0 ;i < count ;i++){
+    if(arr[i].s_id == idToSearch)//Found
+      return(arr[i].n_earned_credits);
   }
-  return(flag);
+  return(-1);//return any random number that can't be a n_crd
 }
 
-void clear_screen(void){
-  int i;
-  for(i = 0 ; i < 50 ; i++){
-    printf("\n");
-  }
-}
-
-void bubble_sort(s_info arr[],int N_students_to_use){
-  int i, j;
-  s_info temp;
-  for(i = 0 ; i < N_students_to_use ; i++){
-       for(j = N_students_to_use ; j > i ; j--){
-            if(arr[j].n_earned_credits > arr[j-1].n_earned_credits){
-                 temp = arr[j];
-                 arr[j] = arr[j-1];
-                 arr[j-1] = temp;
-            }
-       }
-  }
-}
-
-void selection_sort(s_info arr[],int N_students_to_use){
+s_info selection_sorting (s_info arr[40], int count){
   int i, j, max;
   s_info temp;
-  for(i = 0 ; i < N_students_to_use ; i++){
-       max = i;
-       for(j = N_students_to_use ; j > i ; j--){
-            if(arr[j].n_earned_credits > arr[max].n_earned_credits){
-                 max = j;
-            }
-       }
-       if (max != i){
-            temp = arr[i];
-            arr[i] = arr[max];
-            arr[max] = temp;
-       }
+  for(i = 0; i < count; i++){
+    max = i;
+    for(j = count; j > i; j--){
+      if(arr[j].n_earned_credits > arr[max].n_earned_credits)
+        max = j;
+    }
+    if (max != i){
+      temp = arr[i];
+      arr[i] = arr[max];
+      arr[max] = temp;
+    }
   }
+  for (int k = 0; k < count; k++) {
+    printf("\t\t%d\n\t\t%s\t\t%d\n\t\t%s\t\t%s", arr[k].s_id, arr[k].s_name, arr[k].n_earned_credits, arr[k].X.a_name, arr[k].X.a_email);
+    printf("\t\t----------------\n");
+  }
+  return(arr[0]);
 }
 
-void display_array_by_advisor(s_info arr[],int N_students_to_use){
-  int i;
-  for(i = 0 ; i < N_students_to_use ; i++){
-       printf("\t\tStudent ID: %d\n", arr[i].s_id);
-       printf("\t\tStudent Name: %s\n", arr[i].s_name);
-       printf("\t\tStudent Earned Credits: %d\n", arr[i].n_earned_credits);
-       printf("\t\tStudent Advisor Name: %s\n", arr[i].X.a_name);
-       printf("\t\tStudent Advisor Email: %s\n", arr[i].X.a_email);
-       printf("\n");
-       printf("\t\t--------------------------------------------\n");
-       printf("\n");
+void classification (s_info arr[40], int count){
+  int i, flagfresh = 0, flagsophomore = 0, flagjunior = 0, flagsenior = 0;
+  FILE *fresh, *shophomore, *junior, *senior;
+  for(i = 0; i < count; i++){
+    if(arr[i].n_earned_credits < 30){
+      while (flagfresh == 0) {
+        fresh = fopen("freshmane.txt", "w");
+        flagfresh = 1;
+      }
+      fprintf(fresh, "%d\n", arr[i].s_id);
+      fprintf(fresh, "%s", arr[i].s_name);
+      fprintf(fresh, "%d\n", arr[i].n_earned_credits);
+      fprintf(fresh, "%s", arr[i].X.a_name);
+      fprintf(fresh, "%s", arr[i].X.a_email);
+      fprintf(fresh, "----------------\n");
+    }else if(arr[i].n_earned_credits < 60 && arr[i].n_earned_credits >= 30) {
+      while (flagsophomore == 0) {
+        shophomore = fopen("sophomore.txt", "w");
+        flagsophomore = 1;
+      }
+      fprintf(shophomore, "%d\n", arr[i].s_id);
+      fprintf(shophomore, "%s", arr[i].s_name);
+      fprintf(shophomore, "%d\n", arr[i].n_earned_credits);
+      fprintf(shophomore, "%s", arr[i].X.a_name);
+      fprintf(shophomore, "%s", arr[i].X.a_email);
+      fprintf(shophomore, "----------------\n");
+    }else if(arr[i].n_earned_credits < 90 && arr[i].n_earned_credits >= 60) {
+      while (flagjunior == 0) {
+        junior = fopen("junior.txt", "w");
+        flagjunior = 1;
+      }
+      fprintf(junior, "%d\n", arr[i].s_id);
+      fprintf(junior, "%s", arr[i].s_name);
+      fprintf(junior, "%d\n", arr[i].n_earned_credits);
+      fprintf(junior, "%s", arr[i].X.a_name);
+      fprintf(junior, "%s", arr[i].X.a_email);
+      fprintf(junior, "----------------\n");
+    }else if(arr[i].n_earned_credits >= 90) {
+      while (flagsenior == 0) {
+        senior = fopen("senior.txt", "w");
+        flagsenior = 1;
+      }
+      fprintf(senior, "%d\n", arr[i].s_id);  
+      fprintf(senior, "%s", arr[i].s_name);
+      fprintf(senior, "%d\n", arr[i].n_earned_credits);
+      fprintf(senior, "%s", arr[i].X.a_name);
+      fprintf(senior, "%s", arr[i].X.a_email);
+      fprintf(senior, "----------------\n");
+      }
   }
+fclose(fresh);
+fclose(shophomore);
+fclose(junior);
+fclose(senior);
+}
+//--> I changed the menu Options. 
+//--> You need to change main and functions if needed
+//--> Once you load students data to an array, use the array data but not the file data
+//--> for option 6, you need to use a function that will use the array and produce at most four files
+//--> files should be called Freshmen.txt, Sophomore.txt, Junior.txt, Senior.txt
+//--> File should contain the name and the id of the students who meet the requirement down
+//-->Freshman 0-29 crd hours
+//-->Sophomore 30-59 
+//-->Junior 60-89 
+//-->Senior 90 or more crd hours
+//--> Do not create the file till you find a student meeting the requirement
+
+void menu(void){
+  
+  printf("\n\n\t\t--------------- Menu to Use-------------------\n");
+  printf("\t\t|\t\t\t\t\t     |\n");
+  printf("\t\t|1. View the content of the file\t     |\n");
+  printf("\t\t|2. Load data from file to array\t     |\n");
+  printf("\t\t|3. Search for a Student Advisor Information |\n");
+  printf("\t\t|4. Search for Student Earned Credits\t     |\n");
+  printf("\t\t|5. Sort Students by N_ECr(Selection Sort)   |\n");
+  printf("\t\t|6. Classify Students Academically\t     |\n");
+  printf("\t\t|7. QUIT\t\t\t\t     |\n");
+  printf("\t\t|\t\t\t\t\t     |\n");
+  printf("\t\t----------------------------------------------\n");
+  printf("\n\t\tYour Choice Please: ");
 }
